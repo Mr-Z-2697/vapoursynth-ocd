@@ -59,7 +59,14 @@ static const VSFrame *VS_CC invertGetFrame(int n, int activationReason, void *in
 
             cv::Mat inM(h, w, CV_32F), outM(h, w, CV_32F);
             memcpy(inM.data, srcp, h * w * sizeof(float));
-            cv::dct(inM, outM);
+            if (d->enabled == 0)
+                {
+                    cv::dct(inM, outM);
+                }
+            else
+                {
+                    cv::dct(inM, outM, cv::DCT_INVERSE);
+                }
             memcpy(dstp, outM.data, h * w * sizeof(float));
         }
 
@@ -94,7 +101,7 @@ static void VS_CC invertCreate(const VSMap *in, VSMap *out, void *userData, VSCo
     // In this first version we only want to handle 8bit integer formats. Note that
     // vi->format can be 0 if the input clip can change format midstream.
     if (!vsh::isConstantVideoFormat(vi) || vi->format.sampleType != stFloat || vi->format.bitsPerSample != 32) {
-        vsapi->mapSetError(out, "Invert: only constant format 8bit integer input supported");
+        vsapi->mapSetError(out, "dct: only constant format float32 input supported");
         vsapi->freeNode(d.node);
         return;
     }
@@ -105,13 +112,13 @@ static void VS_CC invertCreate(const VSMap *in, VSMap *out, void *userData, VSCo
     // strict checking because of what we wrote in the argument string, the only
     // reason this could fail is when the value wasn't set by the user.
     // And when it's not set we want it to default to enabled.
-    d.enabled = !!vsapi->mapGetInt(in, "enabled", 0, &err);
+    d.enabled = !!vsapi->mapGetInt(in, "inverse", 0, &err);
     if (err)
-        d.enabled = 1;
+        d.enabled = 0;
 
     // Let's pretend the only allowed values are 1 or 0...
     if (d.enabled < 0 || d.enabled > 1) {
-        vsapi->mapSetError(out, "Invert: enabled must be 0 or 1");
+        vsapi->mapSetError(out, "dct: inverse must be 0 or 1");
         vsapi->freeNode(d.node);
         return;
     }
@@ -135,7 +142,7 @@ static void VS_CC invertCreate(const VSMap *in, VSMap *out, void *userData, VSCo
     // prefetch (such as a cache filter).
 
     VSFilterDependency deps[] = {{d.node, rpStrictSpatial}};
-    vsapi->createVideoFilter(out, "Invert", vi, invertGetFrame, invertFree, fmParallel, deps, 1, data, core);
+    vsapi->createVideoFilter(out, "dct", vi, invertGetFrame, invertFree, fmParallel, deps, 1, data, core);
 }
 
 //////////////////////////////////////////
@@ -166,6 +173,6 @@ static void VS_CC invertCreate(const VSMap *in, VSMap *out, void *userData, VSCo
 
 
 VS_EXTERNAL_API(void) VapourSynthPluginInit2(VSPlugin *plugin, const VSPLUGINAPI *vspapi) {
-    vspapi->configPlugin("com.example.invert", "invert", "VapourSynth Invert Example", VS_MAKE_VERSION(1, 0), VAPOURSYNTH_API_VERSION, 0, plugin);
-    vspapi->registerFunction("Filter", "clip:vnode;enabled:int:opt;", "clip:vnode;", invertCreate, NULL, plugin);
+    vspapi->configPlugin("void.ocd", "ocd", "vapoursynth opencv dct", VS_MAKE_VERSION(1, 0), VAPOURSYNTH_API_VERSION, 0, plugin);
+    vspapi->registerFunction("dct", "clip:vnode;inverse:int:opt;", "clip:vnode;", invertCreate, NULL, plugin);
 }
