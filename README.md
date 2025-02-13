@@ -1,6 +1,7 @@
-`core.ocd.dct(clip, inverse=0)`
+`core.ocd.dct(clip, inverse=0)`    
 
-build
+### build
+I only tried mingw    
 ```
 git clone https://github.com/opencv/opencv --depth 1 --branch 4.11.0
 pushd opencv
