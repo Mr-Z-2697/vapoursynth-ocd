@@ -81,6 +81,12 @@ static void VS_CC dctCreate(const VSMap *in, VSMap *out, void *userData, VSCore 
         return;
     }
 
+    if (vi->width % 2 || vi->height % 2) {
+        vsapi->mapSetError(out, "dct: odd dimension(s) not supported");
+        vsapi->freeNode(d.node);
+        return;
+    }
+
     d.enabled = !!vsapi->mapGetInt(in, "inverse", 0, &err);
     if (err)
         d.enabled = 0;
