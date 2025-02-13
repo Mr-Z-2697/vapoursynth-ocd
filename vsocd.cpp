@@ -33,7 +33,7 @@ static const VSFrame *VS_CC dctGetFrame(int n, int activationReason, void *insta
             cv::Mat inM(h, w, CV_32F), outM(h, w, CV_32F);
             for (int y = 0; y < h; y++)
             {
-                memcpy(inM.data, srcp, w * sizeof(float));
+                memcpy(inM.data + inM.step * y, srcp, w * sizeof(float));
                 srcp += src_stride / sizeof(float);
             }
 
@@ -48,7 +48,7 @@ static const VSFrame *VS_CC dctGetFrame(int n, int activationReason, void *insta
 
             for (int y = 0; y < h; y++)
             {
-                memcpy(dstp, outM.data, w * sizeof(float));
+                memcpy(dstp, outM.data + outM.step * y, w * sizeof(float));
                 dstp += dst_stride / sizeof(float);
             }
         }
