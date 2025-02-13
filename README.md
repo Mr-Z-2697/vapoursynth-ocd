@@ -1,4 +1,5 @@
 `core.ocd.dct(clip, inverse=0)`
+
 build
 ```
 git clone https://github.com/opencv/opencv --depth 1 --branch 4.11.0
