@@ -2,6 +2,7 @@
 
 ### build
 I only tried mingw    
+opencv has so many default enabled 3rd party components which is not needed for this simple plugin turn them off I'm too lazy to write them down 😥    
 ```
 git clone https://github.com/opencv/opencv --depth 1 --branch 4.11.0
 pushd opencv
