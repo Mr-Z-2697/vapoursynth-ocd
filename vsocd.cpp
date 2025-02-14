@@ -31,23 +31,18 @@ static const VSFrame *VS_CC dctGetFrame(int n, int activationReason, void *insta
             int w = vsapi->getFrameWidth(src, plane);
 
             cv::Mat inM(h, w, CV_32F), outM(h, w, CV_32F);
-            for (int y = 0; y < h; y++)
-            {
+            for (int y = 0; y < h; y++) {
                 memcpy(inM.data + inM.step * y, srcp, w * sizeof(float));
                 srcp += src_stride / sizeof(float);
             }
 
-            if (d->enabled == 0)
-            {
+            if (d->enabled == 0) {
                 cv::dct(inM, outM);
-            }
-            else
-            {
+            } else {
                 cv::dct(inM, outM, cv::DCT_INVERSE);
             }
 
-            for (int y = 0; y < h; y++)
-            {
+            for (int y = 0; y < h; y++) {
                 memcpy(dstp, outM.data + outM.step * y, w * sizeof(float));
                 dstp += dst_stride / sizeof(float);
             }
@@ -81,8 +76,8 @@ static void VS_CC dctCreate(const VSMap *in, VSMap *out, void *userData, VSCore 
         return;
     }
 
-    if (vi->width % 2 || vi->height % 2) {
-        vsapi->mapSetError(out, "dct: odd dimension(s) not supported");
+    if (vi->width / (1 << vi->format.subSamplingW) % 2 || vi->height / (1 << vi->format.subSamplingH) % 2) {
+        vsapi->mapSetError(out, "dct: odd dimension(s) not supported, check subsampling as well");
         vsapi->freeNode(d.node);
         return;
     }
