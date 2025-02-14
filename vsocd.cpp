@@ -76,7 +76,7 @@ static void VS_CC dctCreate(const VSMap *in, VSMap *out, void *userData, VSCore 
         return;
     }
 
-    if (vi->width / (1 << vi->format.subSamplingW) % 2 || vi->height / (1 << vi->format.subSamplingH) % 2) {
+    if (vi->width % 2 || vi->height % 2 || vi->width / (1 << vi->format.subSamplingW) % 2 || vi->height / (1 << vi->format.subSamplingH) % 2) {
         vsapi->mapSetError(out, "dct: odd dimension(s) not supported, check subsampling as well");
         vsapi->freeNode(d.node);
         return;
