@@ -110,7 +110,7 @@ void VS_CC gblurCreate(const VSMap *in, VSMap *out, void *userData, VSCore *core
     if (err)
         d.borderType = 4;
 
-    if (d.borderType != 0 && d.borderType != 1 && d.borderType != 2 && d.borderType != 4 && d.borderType != 5 && d.borderType != 16) {
+    if (d.borderType != 0 && d.borderType != 1 && d.borderType != 2 && d.borderType != 4 && d.borderType != 16) {
         vsapi->mapSetError(out, "gaussianblur: specified borderType is not supported");
         vsapi->freeNode(d.node);
         return;
