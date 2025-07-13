@@ -2,6 +2,8 @@
 ```
 core.ocd.gaussianblur(clip, sigmax=1, sigmay=0, sizex=0, sizey=0, bordertype=4)
 
+borderType	pixel extrapolation method, see BorderTypes. BORDER_WRAP is not supported.
+
 enum BorderTypes {
     BORDER_CONSTANT    = 0, //!< `iiiiii|abcdefgh|iiiiiii`  with some specified `i`
     BORDER_REPLICATE   = 1, //!< `aaaaaa|abcdefgh|hhhhhhh`
