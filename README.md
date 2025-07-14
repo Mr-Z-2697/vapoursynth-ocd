@@ -1,4 +1,6 @@
 `core.ocd.dct(clip, inverse=0)`    
+Only supports float32 input.    
+
 ```
 core.ocd.gaussianblur(clip, sigmax=1, sigmay=0, sizex=0, sizey=0, bordertype=4)
 
@@ -17,6 +19,8 @@ enum BorderTypes {
     BORDER_ISOLATED    = 16 //!< Interpolation restricted within the ROI boundaries.
 };
 ```    
+Supports uint8 uint16 float32 input.    
+float32 is recommended.    
 
 ### build
 1. Have VapourSynth headers    
