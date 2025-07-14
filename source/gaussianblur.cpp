@@ -15,17 +15,33 @@ const VSFrame *VS_CC gblurGetFrame(int n, int activationReason, void *instanceDa
         VSFrame *dst = vsapi->newVideoFrame(fi, width, height, src, core);
 
         for (int plane = 0; plane < fi->numPlanes; plane++) {
-            const float * VS_RESTRICT srcp = (const float *)vsapi->getReadPtr(src, plane);
+            const uint8_t * VS_RESTRICT srcp = (const uint8_t *)vsapi->getReadPtr(src, plane);
             ptrdiff_t src_stride = vsapi->getStride(src, plane);
-            float * VS_RESTRICT dstp = (float *)vsapi->getWritePtr(dst, plane);
+            uint8_t * VS_RESTRICT dstp = (uint8_t *)vsapi->getWritePtr(dst, plane);
             ptrdiff_t dst_stride = vsapi->getStride(dst, plane);
             int h = vsapi->getFrameHeight(src, plane);
             int w = vsapi->getFrameWidth(src, plane);
 
-            cv::Mat inM(h, w, CV_32F), outM(h, w, CV_32F);
+            int sampleSize, cvFMT;
+            switch (fi->bitsPerSample) {
+                case 8:
+                    sampleSize = sizeof(uint8_t);
+                    cvFMT = CV_8U;
+                    break;
+                case 16:
+                    sampleSize = sizeof(uint16_t);
+                    cvFMT = CV_16U;
+                    break;
+                case 32:
+                    sampleSize = sizeof(float);
+                    cvFMT = CV_32F;
+                    break;
+            }
+
+            cv::Mat inM(h, w, cvFMT), outM(h, w, cvFMT);
             for (int y = 0; y < h; y++) {
-                memcpy(inM.data + inM.step * y, srcp, w * sizeof(float));
-                srcp += src_stride / sizeof(float);
+                memcpy(inM.data + inM.step * y, srcp, w * sampleSize);
+                srcp += src_stride;
             }
 
             if (d->sizeX == 0 && d->sizeY == 0 && plane)
@@ -34,8 +50,8 @@ const VSFrame *VS_CC gblurGetFrame(int n, int activationReason, void *instanceDa
                 cv::GaussianBlur(inM, outM, cv::Size(d->sizeX, d->sizeY), d->sigmaX, d->sigmaY, d->borderType, cv::ALGO_HINT_ACCURATE);
 
             for (int y = 0; y < h; y++) {
-                memcpy(dstp, outM.data + outM.step * y, w * sizeof(float));
-                dstp += dst_stride / sizeof(float);
+                memcpy(dstp, outM.data + outM.step * y, w * sampleSize);
+                dstp += dst_stride;
             }
         }
 
@@ -61,8 +77,10 @@ void VS_CC gblurCreate(const VSMap *in, VSMap *out, void *userData, VSCore *core
     d.node = vsapi->mapGetNode(in, "clip", 0, 0);
     const VSVideoInfo *vi = vsapi->getVideoInfo(d.node);
 
-    if (!vsh::isConstantVideoFormat(vi) || vi->format.sampleType != stFloat || vi->format.bitsPerSample != 32) {
-        vsapi->mapSetError(out, "ocd.gaussianblur: only constant format float32 input supported");
+    if (!vsh::isConstantVideoFormat(vi) ||
+         !(vi->format.sampleType == stFloat && vi->format.bitsPerSample == 32) &&
+         !(vi->format.sampleType == stInteger && (vi->format.bitsPerSample == 8 || vi->format.bitsPerSample == 16))) {
+        vsapi->mapSetError(out, "ocd.gaussianblur: only constant format uint8 uint16 float32 input supported");
         vsapi->freeNode(d.node);
         return;
     }
