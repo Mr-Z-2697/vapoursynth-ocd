@@ -59,13 +59,13 @@ void VS_CC dctCreate(const VSMap *in, VSMap *out, void *userData, VSCore *core, 
     const VSVideoInfo *vi = vsapi->getVideoInfo(d.node);
 
     if (!vsh::isConstantVideoFormat(vi) || vi->format.sampleType != stFloat || vi->format.bitsPerSample != 32) {
-        vsapi->mapSetError(out, "dct: only constant format float32 input supported");
+        vsapi->mapSetError(out, "ocd.dct: only constant format float32 input supported");
         vsapi->freeNode(d.node);
         return;
     }
 
     if (vi->width % 2 || vi->height % 2 || vi->width / (1 << vi->format.subSamplingW) % 2 || vi->height / (1 << vi->format.subSamplingH) % 2) {
-        vsapi->mapSetError(out, "dct: odd dimension(s) not supported, check subsampling as well");
+        vsapi->mapSetError(out, "ocd.dct: odd dimension(s) not supported, check subsampling as well");
         vsapi->freeNode(d.node);
         return;
     }
@@ -75,7 +75,7 @@ void VS_CC dctCreate(const VSMap *in, VSMap *out, void *userData, VSCore *core, 
         d.inverse = 0;
 
     if (d.inverse < 0 || d.inverse > 1) {
-        vsapi->mapSetError(out, "dct: inverse must be 0 or 1");
+        vsapi->mapSetError(out, "ocd.dct: inverse must be 0 or 1");
         vsapi->freeNode(d.node);
         return;
     }

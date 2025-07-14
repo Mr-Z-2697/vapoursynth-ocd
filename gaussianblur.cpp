@@ -62,7 +62,7 @@ void VS_CC gblurCreate(const VSMap *in, VSMap *out, void *userData, VSCore *core
     const VSVideoInfo *vi = vsapi->getVideoInfo(d.node);
 
     if (!vsh::isConstantVideoFormat(vi) || vi->format.sampleType != stFloat || vi->format.bitsPerSample != 32) {
-        vsapi->mapSetError(out, "gaussianblur: only constant format float32 input supported");
+        vsapi->mapSetError(out, "ocd.gaussianblur: only constant format float32 input supported");
         vsapi->freeNode(d.node);
         return;
     }
@@ -72,7 +72,7 @@ void VS_CC gblurCreate(const VSMap *in, VSMap *out, void *userData, VSCore *core
         d.sigmaX = 1.;
 
     if (d.sigmaX < 0) {
-        vsapi->mapSetError(out, "gaussianblur: sigmaX must be >= 0");
+        vsapi->mapSetError(out, "ocd.gaussianblur: sigmaX must be >= 0");
         vsapi->freeNode(d.node);
         return;
     }
@@ -82,7 +82,7 @@ void VS_CC gblurCreate(const VSMap *in, VSMap *out, void *userData, VSCore *core
         d.sigmaY = 0.;
 
     if (d.sigmaY < 0) {
-        vsapi->mapSetError(out, "gaussianblur: sigmaY must be >= 0");
+        vsapi->mapSetError(out, "ocd.gaussianblur: sigmaY must be >= 0");
         vsapi->freeNode(d.node);
         return;
     }
@@ -95,13 +95,13 @@ void VS_CC gblurCreate(const VSMap *in, VSMap *out, void *userData, VSCore *core
         d.sizeY = 0;
 
     if (!(d.sizeX == 0 && d.sizeY == 0) && (d.sizeX < 0 || d.sizeY < 0 || !(d.sizeX % 2) || !(d.sizeY % 2))) {
-        vsapi->mapSetError(out, "gaussianblur: sizeX and sizeY must be positive and odd, or both zero");
+        vsapi->mapSetError(out, "ocd.gaussianblur: sizeX and sizeY must be positive and odd, or both zero");
         vsapi->freeNode(d.node);
         return;
     }
 
     if (d.sigmaX == 0. && d.sigmaY == 0. && d.sizeX == 0 && d.sizeY == 0) {
-        vsapi->mapSetError(out, "gaussianblur: size and sigma can't be all zero's");
+        vsapi->mapSetError(out, "ocd.gaussianblur: size and sigma can't be all zero's");
         vsapi->freeNode(d.node);
         return;
     }
@@ -111,7 +111,7 @@ void VS_CC gblurCreate(const VSMap *in, VSMap *out, void *userData, VSCore *core
         d.borderType = 4;
 
     if (d.borderType != 0 && d.borderType != 1 && d.borderType != 2 && d.borderType != 4 && d.borderType != 16) {
-        vsapi->mapSetError(out, "gaussianblur: specified borderType is not supported");
+        vsapi->mapSetError(out, "ocd.gaussianblur: specified borderType is not supported");
         vsapi->freeNode(d.node);
         return;
     }
@@ -121,5 +121,5 @@ void VS_CC gblurCreate(const VSMap *in, VSMap *out, void *userData, VSCore *core
 
 
     VSFilterDependency deps[] = {{d.node, rpStrictSpatial}};
-    vsapi->createVideoFilter(out, "dct", vi, gblurGetFrame, gblurFree, fmParallel, deps, 1, data, core);
+    vsapi->createVideoFilter(out, "gaussianblur", vi, gblurGetFrame, gblurFree, fmParallel, deps, 1, data, core);
 }
