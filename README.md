@@ -23,6 +23,6 @@ Supports uint8 uint16 float32 input.
 float32 is recommended.    
 
 ### build
-1. Have VapourSynth headers    
+1. Have VapourSynth API4 headers    
 2. Run ocd.sh    
 (I only tried mingw)    
