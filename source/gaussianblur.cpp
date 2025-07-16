@@ -44,8 +44,8 @@ const VSFrame *VS_CC gblurGetFrame(int n, int activationReason, void *instanceDa
                 srcp += src_stride;
             }
 
-            if (d->sizeX == 0 && d->sizeY == 0 && plane)
-                cv::GaussianBlur(inM, outM, cv::Size(d->sizeX, d->sizeY), d->sigmaX * ((double)w / width), d->sigmaY * ((double)h / height), d->borderType, cv::ALGO_HINT_ACCURATE);
+            if (w != width || h != height)
+                cv::GaussianBlur(inM, outM, cv::Size(d->sizeX * ((double)w / width), d->sizeY * ((double)h / height)), d->sigmaX * ((double)w / width), d->sigmaY * ((double)h / height), d->borderType, cv::ALGO_HINT_ACCURATE);
             else
                 cv::GaussianBlur(inM, outM, cv::Size(d->sizeX, d->sizeY), d->sigmaX, d->sigmaY, d->borderType, cv::ALGO_HINT_ACCURATE);
 
