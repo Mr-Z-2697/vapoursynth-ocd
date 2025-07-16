@@ -46,7 +46,7 @@ const VSFrame *VS_CC gblurGetFrame(int n, int activationReason, void *instanceDa
 
             if (w != width || h != height) {
                 int sizeXS = int(d->sizeX * ((double)w / width)) | 1, sizeYS = int(d->sizeY * ((double)h / height)) | 1;
-                cv::GaussianBlur(inM, outM, cv::Size(sizeXS, sizeYS), d->sigmaX * ((double)w / width), d->sigmaY * ((double)h / height), d->borderType, cv::ALGO_HINT_ACCURATE);
+                cv::GaussianBlur(inM, outM, cv::Size(d->sizeX ? sizeXS : 0, d->sizeY ? sizeYS : 0), d->sigmaX * ((double)w / width), d->sigmaY * ((double)h / height), d->borderType, cv::ALGO_HINT_ACCURATE);
             }
             else
                 cv::GaussianBlur(inM, outM, cv::Size(d->sizeX, d->sizeY), d->sigmaX, d->sigmaY, d->borderType, cv::ALGO_HINT_ACCURATE);
